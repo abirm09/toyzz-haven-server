@@ -42,7 +42,6 @@ async function run() {
     //get toys by categories
     app.get("/toy/category", async (req, res) => {
       const cat = req.query.category;
-      console.log(cat);
       const query = { subcategory: { $regex: cat, $options: "i" } };
       const result = await allToys.find(query).toArray();
       res.send(result);
