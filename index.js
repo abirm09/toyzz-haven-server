@@ -39,15 +39,13 @@ async function run() {
       const category = ["Marvel", "Avengers", "Star Wars"];
       res.send(category);
     });
-    //get data by different categories
-    app.get("/toys/categories", async (req, res) => {
-      const marvelQuery = { subcategory: "Marvel" };
-      const avengersQuery = { subcategory: "Avengers" };
-      const starWarsQuery = { subcategory: "Star Wars" };
-      const marvel = await allToys.find(marvelQuery).toArray();
-      const avengers = await allToys.find(avengersQuery).toArray();
-      const starWars = await allToys.find(starWarsQuery).toArray();
-      res.send({ marvel, avengers, starWars });
+    //get toys by categories
+    app.get("/toy/category", async (req, res) => {
+      const cat = req.query.category;
+      console.log(cat);
+      const query = { subcategory: { $regex: cat, $options: "i" } };
+      const result = await allToys.find(query).toArray();
+      res.send(result);
     });
     app.get("/toys/limit20", async (req, res) => {
       const result = await allToys.find().limit(20).toArray();
