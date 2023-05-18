@@ -1,6 +1,6 @@
 const express = require("express");
 const cors = require("cors");
-const { MongoClient, ServerApiVersion } = require("mongodb");
+const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 const jwt = require("jsonwebtoken");
 require("dotenv").config();
 const port = process.env.PORT || 5000;
@@ -26,7 +26,7 @@ const client = new MongoClient(uri, {
 async function run() {
   try {
     // Connect the client to the server	(optional starting in v4.7)
-    await client.connect();
+    client.connect();
 
     const allToys = client.db("toyzzHaven").collection("allToys");
     //get all toys
@@ -51,6 +51,20 @@ async function run() {
     });
     app.get("/toys/limit20", async (req, res) => {
       const result = await allToys.find().limit(20).toArray();
+      res.send(result);
+    });
+    //get data by product id
+    app.get("/toy/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      const result = await allToys.findOne(query);
+      res.send(result);
+    });
+    //get toys with name
+    app.get("/toys/search", async (req, res) => {
+      const searchParam = req.query.search;
+      const query = { toy_name: { $regex: searchParam, $options: "i" } };
+      const result = await allToys.find(query).limit(20).toArray();
       res.send(result);
     });
     // Send a ping to confirm a successful connection
