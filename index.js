@@ -39,6 +39,20 @@ async function run() {
       const category = ["Marvel", "Avengers", "Star Wars"];
       res.send(category);
     });
+    //get data by different categories
+    app.get("/toys/categories", async (req, res) => {
+      const marvelQuery = { subcategory: "Marvel" };
+      const avengersQuery = { subcategory: "Avengers" };
+      const starWarsQuery = { subcategory: "Star Wars" };
+      const marvel = await allToys.find(marvelQuery).toArray();
+      const avengers = await allToys.find(avengersQuery).toArray();
+      const starWars = await allToys.find(starWarsQuery).toArray();
+      res.send({ marvel, avengers, starWars });
+    });
+    app.get("/toys/limit20", async (req, res) => {
+      const result = await allToys.find().limit(20).toArray();
+      res.send(result);
+    });
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
     console.log(
