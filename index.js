@@ -73,11 +73,23 @@ async function run() {
       const result = await allToys.findOne(query);
       res.send(result);
     });
-    //get toys with name
+    //get toys by name
     app.get("/toys/search", async (req, res) => {
       const searchParam = req.query.search;
       const query = { toy_name: { $regex: searchParam, $options: "i" } };
       const result = await allToys.find(query).limit(20).toArray();
+      res.send(result);
+    });
+
+    //get added toys
+    app.post("/toy/getMyToy", verifyJWT, async (req, res) => {
+      const email = req.body.email;
+      const decodedEmail = req.decoded.email;
+      if (email !== decodedEmail) {
+        return res.send({ error: true, message: "Un authorize user." });
+      }
+      const query = { email };
+      const result = await allToys.find(query).toArray();
       res.send(result);
     });
 
