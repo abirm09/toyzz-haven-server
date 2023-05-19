@@ -64,6 +64,17 @@ async function run() {
       const result = await allToys.find(query).limit(20).toArray();
       res.send(result);
     });
+
+    //get jwt
+    app.post("/jwt", (req, res) => {
+      const email = req.body;
+      console.log(email);
+      const token = jwt.sign(email, process.env.ACCESSTOKEN_SECRET, {
+        expiresIn: "5h",
+      });
+      res.send({ token });
+    });
+
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
     console.log(
