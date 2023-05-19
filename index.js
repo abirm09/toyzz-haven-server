@@ -23,6 +23,22 @@ const client = new MongoClient(uri, {
   },
 });
 
+//verifyJWT
+const verifyJWT = (req, res, next) => {
+  const authenticate = req.headers.authenticate;
+  if (!authenticate) {
+    return res.send({ error: true, message: "Un authorize user." });
+  }
+  const token = authenticate.split(" ")[1];
+  jwt.verify(token, process.env.ACCESSTOKEN_SECRET, (err, decoded) => {
+    if (err) {
+      return res.send({ error: true, message: "Un authorize user." });
+    }
+    req.decoded = decoded;
+    next();
+  });
+};
+
 async function run() {
   try {
     // Connect the client to the server	(optional starting in v4.7)
@@ -68,11 +84,21 @@ async function run() {
     //get jwt
     app.post("/jwt", (req, res) => {
       const email = req.body;
-      console.log(email);
       const token = jwt.sign(email, process.env.ACCESSTOKEN_SECRET, {
         expiresIn: "5h",
       });
       res.send({ token });
+    });
+
+    //store new toy
+    app.post("/toy/add", verifyJWT, async (req, res) => {
+      const decodedEmail = req.decoded.email;
+      const body = req.body;
+      if (decodedEmail !== body.email) {
+        return res.send({ error: true, message: "Un authorize user." });
+      }
+      const result = await allToys.insertOne(body);
+      res.send(result);
     });
 
     // Send a ping to confirm a successful connection
