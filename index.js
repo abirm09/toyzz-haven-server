@@ -113,6 +113,29 @@ async function run() {
       res.send(result);
     });
 
+    //update a toy
+    app.put("/toy/update", verifyJWT, async (req, res) => {
+      const body = req.body;
+      const email = body.email;
+      if (req.decoded.email !== email) {
+        return res.send({ error: true, message: "Un authorize user." });
+      }
+      const filter = { _id: new ObjectId(body.id) };
+      const updateDoc = {
+        $set: body.toyDetails,
+      };
+      const options = { upsert: true };
+      const result = await allToys.updateOne(filter, updateDoc, options);
+      res.send(result);
+    });
+
+    //delete a toy
+    app.delete("/toy/delete", verifyJWT, async (req, res) => {
+      const id = req.query.id;
+      const query = { _id: new ObjectId(id) };
+      const result = await allToys.deleteOne(query);
+      res.send(result);
+    });
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
     console.log(
