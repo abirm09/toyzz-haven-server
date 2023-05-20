@@ -92,7 +92,20 @@ async function run() {
       const result = await allToys.find(query).toArray();
       res.send(result);
     });
-
+    //get toy by sorting
+    app.post("/toy/sort", verifyJWT, async (req, res) => {
+      const email = req.body.email.email;
+      const decodedEmail = req.decoded.email;
+      if (email !== decodedEmail) {
+        return res.send({ error: true, message: "Un authorize user." });
+      }
+      const query = { email };
+      const result = await allToys
+        .find(query)
+        .sort({ price: req.body.value })
+        .toArray();
+      res.send(result);
+    });
     //get jwt
     app.post("/jwt", (req, res) => {
       const email = req.body;
