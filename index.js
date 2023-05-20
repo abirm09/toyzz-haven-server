@@ -80,7 +80,12 @@ async function run() {
       const result = await allToys.find(query).limit(20).toArray();
       res.send(result);
     });
-
+    //get random three
+    app.get("/toys/randomThree", async (req, res) => {
+      const query = { $sample: { size: 3 } };
+      const result = await allToys.aggregate([query]).toArray();
+      res.send(result);
+    });
     //get added toys
     app.post("/toy/getMyToy", verifyJWT, async (req, res) => {
       const email = req.body.email;
